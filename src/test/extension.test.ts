@@ -1,9 +1,11 @@
 import * as assert from "node:assert";
+import * as vscode from "vscode";
 
 import {
   AutoCloseController,
   closeConfiguredParts,
   getCloseCommands,
+  isTerminalInEditorArea,
   type WorkbenchCloserSettings,
 } from "../extension";
 
@@ -21,6 +23,14 @@ function createSettings(
     secondarySidebar: { enabled: true, selectionChangeWindow: 3000 },
     panel: { enabled: true, selectionChangeWindow: 3000 },
   };
+}
+
+function createTerminal(
+  location: vscode.TerminalOptions["location"]
+): vscode.Terminal {
+  return {
+    creationOptions: { location },
+  } as vscode.Terminal;
 }
 
 suite("Workbench Closer", () => {
@@ -171,6 +181,24 @@ suite("Workbench Closer", () => {
       "secondarySidebar",
       "panel",
     ]);
+  });
+
+  test("distinguishes editor-area and panel terminals", () => {
+    const editorTerminal = createTerminal(vscode.TerminalLocation.Editor);
+    const panelTerminal = createTerminal(vscode.TerminalLocation.Panel);
+    const unknownTerminal = createTerminal(undefined);
+    const splitEditorTerminal = createTerminal({
+      parentTerminal: editorTerminal,
+    });
+    const splitPanelTerminal = createTerminal({
+      parentTerminal: panelTerminal,
+    });
+
+    assert.strictEqual(isTerminalInEditorArea(editorTerminal), true);
+    assert.strictEqual(isTerminalInEditorArea(panelTerminal), false);
+    assert.strictEqual(isTerminalInEditorArea(unknownTerminal), false);
+    assert.strictEqual(isTerminalInEditorArea(splitEditorTerminal), true);
+    assert.strictEqual(isTerminalInEditorArea(splitPanelTerminal), false);
   });
 
   test("closes only the configured parts", async () => {

@@ -18,9 +18,11 @@ signals as practical proxies:
 - the active editor's selection changes
 - the active terminal changes
 
-The terminal event is `onDidChangeActiveTerminal`; it detects a terminal
-becoming active or changing, but not every mouse-only focus transition to an
-already-active terminal.
+The terminal event is `onDidChangeActiveTerminal`; it detects an editor-area
+terminal becoming active or changing, but not every mouse-only focus transition
+to an already-active terminal. Terminals in the bottom panel are ignored so
+opening one does not immediately close the panel that contains it. Terminals
+whose location is unavailable are treated as panel terminals.
 
 An active-editor change is not a closing signal. It starts a new activity
 session by clearing the previous editor's selection-change history and any

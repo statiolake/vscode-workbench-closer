@@ -5,6 +5,11 @@ this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Ignore bottom-panel terminals as terminal closing triggers to prevent the
+  panel from closing itself and retriggering terminal activation.
+
 ## [0.3.3] - 2026-08-15
 
 ### Fixed

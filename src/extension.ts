@@ -33,6 +33,39 @@ const CLOSE_COMMANDS: Readonly<Record<WorkbenchPart, string>> = {
   panel: "workbench.action.closePanel",
 };
 
+function isTerminalInEditorAreaInternal(
+  terminal: vscode.Terminal,
+  visited: Set<vscode.Terminal>
+): boolean {
+  if (visited.has(terminal)) {
+    return false;
+  }
+  visited.add(terminal);
+
+  const location = terminal.creationOptions.location;
+  if (location === vscode.TerminalLocation.Editor) {
+    return true;
+  }
+
+  if (typeof location !== "object" || location === null) {
+    return false;
+  }
+
+  if ("viewColumn" in location) {
+    return true;
+  }
+
+  if ("parentTerminal" in location) {
+    return isTerminalInEditorAreaInternal(location.parentTerminal, visited);
+  }
+
+  return false;
+}
+
+export function isTerminalInEditorArea(terminal: vscode.Terminal): boolean {
+  return isTerminalInEditorAreaInternal(terminal, new Set());
+}
+
 function normalizeWindow(window: number): number {
   return Number.isFinite(window)
     ? Math.max(1, Math.floor(window))
@@ -271,7 +304,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }),
       vscode.window.onDidChangeActiveTerminal((terminal) => {
-        if (terminal) {
+        if (terminal && isTerminalInEditorArea(terminal)) {
           closeFromTrigger(controller.handleActiveTerminalChange());
         }
       })
