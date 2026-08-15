@@ -1,0 +1,117 @@
+{
+  "name": "vscode-workbench-closer",
+  "displayName": "Workbench Closer",
+  "description": "Automatically closes selected VS Code workbench parts after editor activity or terminal activation.",
+  "version": "0.3.3",
+  "publisher": "statiolake",
+  "author": "statiolake",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "workbench",
+    "sidebar",
+    "panel",
+    "productivity",
+    "focus"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/statiolake/vscode-workbench-closer"
+  },
+  "bugs": {
+    "url": "https://github.com/statiolake/vscode-workbench-closer/issues"
+  },
+  "homepage": "https://github.com/statiolake/vscode-workbench-closer#readme",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-workbench-closer.closeConfiguredParts",
+        "title": "Workbench Closer: Close Configured Parts",
+        "category": "View"
+      },
+      {
+        "command": "vscode-workbench-closer.toggleAutomaticClosing",
+        "title": "Workbench Closer: Toggle Automatic Closing",
+        "category": "View"
+      }
+    ],
+    "configuration": {
+      "title": "Workbench Closer",
+      "properties": {
+        "vscode-workbench-closer.selectionChangeThreshold": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 1,
+          "description": "Number of editor selection changes required within a workbench part's activity window to start its closing delay."
+        },
+        "vscode-workbench-closer.primarySidebar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically close the primary sidebar after enough editor selection changes or terminal activation."
+        },
+        "vscode-workbench-closer.primarySidebar.selectionChangeWindow": {
+          "type": "integer",
+          "default": 3000,
+          "minimum": 1,
+          "description": "Activity window and closing delay in milliseconds for the primary sidebar. After the threshold is reached, it closes on the first selection change after this time from the first qualifying change."
+        },
+        "vscode-workbench-closer.secondarySidebar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically close the secondary sidebar after enough editor selection changes or terminal activation."
+        },
+        "vscode-workbench-closer.secondarySidebar.selectionChangeWindow": {
+          "type": "integer",
+          "default": 3000,
+          "minimum": 1,
+          "description": "Activity window and closing delay in milliseconds for the secondary sidebar. After the threshold is reached, it closes on the first selection change after this time from the first qualifying change."
+        },
+        "vscode-workbench-closer.panel.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically close the bottom panel after enough editor selection changes or terminal activation."
+        },
+        "vscode-workbench-closer.panel.selectionChangeWindow": {
+          "type": "integer",
+          "default": 3000,
+          "minimum": 1,
+          "description": "Activity window and closing delay in milliseconds for the bottom panel. After the threshold is reached, it closes on the first selection change after this time from the first qualifying change."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "pretest": "npm run compile && npm run lint",
+    "test": "vscode-test",
+    "package": "npm run compile && npm run lint && vsce package",
+    "publish": "npm run compile && npm run lint && vsce publish",
+    "publish:vsce": "npm run compile && npm run lint && vsce publish",
+    "publish:ovsx": "npm run compile && npm run lint && ovsx publish"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.6.2",
+    "eslint": "^9.36.0",
+    "ovsx": "^1.0.2",
+    "typescript": "^5.9.3"
+  }
+}
