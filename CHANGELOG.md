@@ -5,10 +5,12 @@ this file.
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-08-17
+
 ### Fixed
 
-- Ignore bottom-panel terminals as terminal closing triggers to prevent the
-  panel from closing itself and retriggering terminal activation.
+- Detect editor-area terminals through active `TabInputTerminal` tabs and
+  ignore bottom-panel terminals to prevent the panel from closing itself.
 
 ## [0.3.3] - 2026-08-15
 

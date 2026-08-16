@@ -33,37 +33,13 @@ const CLOSE_COMMANDS: Readonly<Record<WorkbenchPart, string>> = {
   panel: "workbench.action.closePanel",
 };
 
-function isTerminalInEditorAreaInternal(
-  terminal: vscode.Terminal,
-  visited: Set<vscode.Terminal>
-): boolean {
-  if (visited.has(terminal)) {
-    return false;
-  }
-  visited.add(terminal);
-
-  const location = terminal.creationOptions.location;
-  if (location === vscode.TerminalLocation.Editor) {
-    return true;
-  }
-
-  if (typeof location !== "object" || location === null) {
-    return false;
-  }
-
-  if ("viewColumn" in location) {
-    return true;
-  }
-
-  if ("parentTerminal" in location) {
-    return isTerminalInEditorAreaInternal(location.parentTerminal, visited);
-  }
-
-  return false;
+export function isEditorTerminalTabInput(input: unknown): boolean {
+  return input instanceof vscode.TabInputTerminal;
 }
 
-export function isTerminalInEditorArea(terminal: vscode.Terminal): boolean {
-  return isTerminalInEditorAreaInternal(terminal, new Set());
+function isActiveEditorTerminalTab(): boolean {
+  const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
+  return isEditorTerminalTabInput(activeTab?.input);
 }
 
 function normalizeWindow(window: number): number {
@@ -211,7 +187,7 @@ export class AutoCloseController {
     return partsToClose;
   }
 
-  public handleActiveTerminalChange(): WorkbenchPart[] {
+  public handleEditorTerminalFocus(): WorkbenchPart[] {
     const currentSettings = this.settings();
     const partsToClose = getEnabledParts(currentSettings);
 
@@ -266,6 +242,7 @@ export async function closeConfiguredParts(
 
 export function activate(context: vscode.ExtensionContext) {
   let eventDisposables: vscode.Disposable[] = [];
+  let editorTerminalTabWasActive = false;
   const controller = new AutoCloseController(getSettings);
 
   const disposeEventListeners = () => {
@@ -288,6 +265,7 @@ export function activate(context: vscode.ExtensionContext) {
   const refreshEventListeners = () => {
     disposeEventListeners();
     controller.reset();
+    editorTerminalTabWasActive = isActiveEditorTerminalTab();
 
     const settings = getSettings();
     if (getEnabledParts(settings).length === 0) {
@@ -303,10 +281,17 @@ export function activate(context: vscode.ExtensionContext) {
           closeFromTrigger(controller.handleSelectionChange());
         }
       }),
-      vscode.window.onDidChangeActiveTerminal((terminal) => {
-        if (terminal && isTerminalInEditorArea(terminal)) {
-          closeFromTrigger(controller.handleActiveTerminalChange());
+      vscode.window.tabGroups.onDidChangeTabs(() => {
+        const editorTerminalTabIsActive = isActiveEditorTerminalTab();
+        if (!editorTerminalTabIsActive) {
+          editorTerminalTabWasActive = false;
+          return;
         }
+
+        if (!editorTerminalTabWasActive) {
+          closeFromTrigger(controller.handleEditorTerminalFocus());
+        }
+        editorTerminalTabWasActive = true;
       })
     );
   };

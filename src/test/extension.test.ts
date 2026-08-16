@@ -5,7 +5,7 @@ import {
   AutoCloseController,
   closeConfiguredParts,
   getCloseCommands,
-  isTerminalInEditorArea,
+  isEditorTerminalTabInput,
   type WorkbenchCloserSettings,
 } from "../extension";
 
@@ -23,14 +23,6 @@ function createSettings(
     secondarySidebar: { enabled: true, selectionChangeWindow: 3000 },
     panel: { enabled: true, selectionChangeWindow: 3000 },
   };
-}
-
-function createTerminal(
-  location: vscode.TerminalOptions["location"]
-): vscode.Terminal {
-  return {
-    creationOptions: { location },
-  } as vscode.Terminal;
 }
 
 suite("Workbench Closer", () => {
@@ -171,34 +163,30 @@ suite("Workbench Closer", () => {
     ]);
   });
 
-  test("handles terminal activation as a direct closing trigger", () => {
+  test("handles editor terminal focus as a direct closing trigger", () => {
     let now = 0;
     const settings = createSettings();
     const controller = new AutoCloseController(() => settings, () => now);
 
-    assert.deepStrictEqual(controller.handleActiveTerminalChange(), [
+    assert.deepStrictEqual(controller.handleEditorTerminalFocus(), [
       "primarySidebar",
       "secondarySidebar",
       "panel",
     ]);
   });
 
-  test("distinguishes editor-area and panel terminals", () => {
-    const editorTerminal = createTerminal(vscode.TerminalLocation.Editor);
-    const panelTerminal = createTerminal(vscode.TerminalLocation.Panel);
-    const unknownTerminal = createTerminal(undefined);
-    const splitEditorTerminal = createTerminal({
-      parentTerminal: editorTerminal,
-    });
-    const splitPanelTerminal = createTerminal({
-      parentTerminal: panelTerminal,
-    });
-
-    assert.strictEqual(isTerminalInEditorArea(editorTerminal), true);
-    assert.strictEqual(isTerminalInEditorArea(panelTerminal), false);
-    assert.strictEqual(isTerminalInEditorArea(unknownTerminal), false);
-    assert.strictEqual(isTerminalInEditorArea(splitEditorTerminal), true);
-    assert.strictEqual(isTerminalInEditorArea(splitPanelTerminal), false);
+  test("distinguishes editor terminal tabs from panel terminals", () => {
+    assert.strictEqual(
+      isEditorTerminalTabInput(new vscode.TabInputTerminal()),
+      true
+    );
+    assert.strictEqual(isEditorTerminalTabInput(undefined), false);
+    assert.strictEqual(
+      isEditorTerminalTabInput(
+        new vscode.TabInputText(vscode.Uri.parse("untitled:editor"))
+      ),
+      false
+    );
   });
 
   test("closes only the configured parts", async () => {

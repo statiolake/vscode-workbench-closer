@@ -2,7 +2,7 @@
   "name": "vscode-workbench-closer",
   "displayName": "Workbench Closer",
   "description": "Automatically closes selected VS Code workbench parts after editor activity or terminal activation.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publisher": "statiolake",
   "author": "statiolake",
   "license": "MIT",

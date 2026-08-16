@@ -18,11 +18,12 @@ signals as practical proxies:
 - the active editor's selection changes
 - the active terminal changes
 
-The terminal event is `onDidChangeActiveTerminal`; it detects an editor-area
-terminal becoming active or changing, but not every mouse-only focus transition
-to an already-active terminal. Terminals in the bottom panel are ignored so
-opening one does not immediately close the panel that contains it. Terminals
-whose location is unavailable are treated as panel terminals.
+The extension watches the active editor tab and reacts to
+`TabInputTerminal` tabs. This detects the transition from a panel terminal to
+an editor-area terminal without treating the panel terminal that was just
+opened as a reason to close its own panel. Focusing an already-selected editor
+terminal still cannot be observed as a separate focus event through the public
+API.
 
 An active-editor change is not a closing signal. It starts a new activity
 session by clearing the previous editor's selection-change history and any
