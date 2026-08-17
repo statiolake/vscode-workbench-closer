@@ -1,7 +1,7 @@
 # Workbench Closer
 
 Automatically closes selected VS Code workbench parts after enough editor
-activity or terminal activation.
+activity.
 
 The extension can close these areas independently:
 
@@ -16,14 +16,11 @@ event for these areas. Workbench Closer therefore uses these editor-side
 signals as practical proxies:
 
 - the active editor's selection changes
-- the active terminal changes
 
-The extension watches the active editor tab and reacts to
-`TabInputTerminal` tabs. This detects the transition from a panel terminal to
-an editor-area terminal without treating the panel terminal that was just
-opened as a reason to close its own panel. Focusing an already-selected editor
-terminal still cannot be observed as a separate focus event through the public
-API.
+Terminal activation and focus are intentionally ignored. VS Code's public
+extension API does not provide a reliable mapping between an active terminal
+and its editor-area or bottom-panel representation, so terminal events are not
+used as automatic-closing triggers.
 
 An active-editor change is not a closing signal. It starts a new activity
 session by clearing the previous editor's selection-change history and any
@@ -51,11 +48,6 @@ selection change is reported.
 
 There is no quiet-period re-arm requirement. After a part closes, a new
 selection-change history can immediately start building.
-
-Activating a terminal is a direct closing trigger and does not require the
-selection-change threshold. The terminal event is
-`onDidChangeActiveTerminal`; it detects a terminal becoming active or changing,
-but not every mouse-only focus transition to an already-active terminal.
 
 This is an activity heuristic, not a general focus event. For example, merely
 reading an editor without changing its selection may not produce enough

@@ -1,8 +1,8 @@
 {
   "name": "vscode-workbench-closer",
   "displayName": "Workbench Closer",
-  "description": "Automatically closes selected VS Code workbench parts after editor activity or terminal activation.",
-  "version": "0.3.4",
+  "description": "Automatically closes selected VS Code workbench parts after editor activity.",
+  "version": "0.3.5",
   "publisher": "statiolake",
   "author": "statiolake",
   "license": "MIT",
@@ -56,7 +56,7 @@
         "vscode-workbench-closer.primarySidebar.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically close the primary sidebar after enough editor selection changes or editor-area terminal activation."
+          "description": "Automatically close the primary sidebar after enough editor selection changes."
         },
         "vscode-workbench-closer.primarySidebar.selectionChangeWindow": {
           "type": "integer",
@@ -67,7 +67,7 @@
         "vscode-workbench-closer.secondarySidebar.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically close the secondary sidebar after enough editor selection changes or editor-area terminal activation."
+          "description": "Automatically close the secondary sidebar after enough editor selection changes."
         },
         "vscode-workbench-closer.secondarySidebar.selectionChangeWindow": {
           "type": "integer",
@@ -78,7 +78,7 @@
         "vscode-workbench-closer.panel.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically close the bottom panel after enough editor selection changes or editor-area terminal activation."
+          "description": "Automatically close the bottom panel after enough editor selection changes."
         },
         "vscode-workbench-closer.panel.selectionChangeWindow": {
           "type": "integer",

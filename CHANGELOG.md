@@ -5,6 +5,13 @@ this file.
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-08-18
+
+### Changed
+
+- Ignore terminal activation and focus; automatic closing now uses editor
+  selection changes only.
+
 ## [0.3.4] - 2026-08-17
 
 ### Fixed

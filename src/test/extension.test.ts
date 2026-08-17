@@ -1,11 +1,9 @@
 import * as assert from "node:assert";
-import * as vscode from "vscode";
 
 import {
   AutoCloseController,
   closeConfiguredParts,
   getCloseCommands,
-  isEditorTerminalTabInput,
   type WorkbenchCloserSettings,
 } from "../extension";
 
@@ -161,32 +159,6 @@ suite("Workbench Closer", () => {
       "secondarySidebar",
       "panel",
     ]);
-  });
-
-  test("handles editor terminal focus as a direct closing trigger", () => {
-    let now = 0;
-    const settings = createSettings();
-    const controller = new AutoCloseController(() => settings, () => now);
-
-    assert.deepStrictEqual(controller.handleEditorTerminalFocus(), [
-      "primarySidebar",
-      "secondarySidebar",
-      "panel",
-    ]);
-  });
-
-  test("distinguishes editor terminal tabs from panel terminals", () => {
-    assert.strictEqual(
-      isEditorTerminalTabInput(new vscode.TabInputTerminal()),
-      true
-    );
-    assert.strictEqual(isEditorTerminalTabInput(undefined), false);
-    assert.strictEqual(
-      isEditorTerminalTabInput(
-        new vscode.TabInputText(vscode.Uri.parse("untitled:editor"))
-      ),
-      false
-    );
   });
 
   test("closes only the configured parts", async () => {

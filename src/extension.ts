@@ -33,15 +33,6 @@ const CLOSE_COMMANDS: Readonly<Record<WorkbenchPart, string>> = {
   panel: "workbench.action.closePanel",
 };
 
-export function isEditorTerminalTabInput(input: unknown): boolean {
-  return input instanceof vscode.TabInputTerminal;
-}
-
-function isActiveEditorTerminalTab(): boolean {
-  const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
-  return isEditorTerminalTabInput(activeTab?.input);
-}
-
 function normalizeWindow(window: number): number {
   return Number.isFinite(window)
     ? Math.max(1, Math.floor(window))
@@ -107,8 +98,7 @@ export function getCloseCommands(
  * No timer closes anything. Each part tracks selection changes in a sliding
  * activity window. When the configured threshold is reached, the first event
  * in that qualifying window starts the close delay. The part closes on the
- * first later selection change after that delay. Terminal activation is a
- * separate, direct closing trigger.
+ * first later selection change after that delay.
  */
 export class AutoCloseController {
   private readonly activityByPart = new Map<
@@ -187,17 +177,6 @@ export class AutoCloseController {
     return partsToClose;
   }
 
-  public handleEditorTerminalFocus(): WorkbenchPart[] {
-    const currentSettings = this.settings();
-    const partsToClose = getEnabledParts(currentSettings);
-
-    for (const part of partsToClose) {
-      this.resetPart(part);
-    }
-
-    return partsToClose;
-  }
-
   private resetPart(part: WorkbenchPart): void {
     this.activityByPart.set(part, {
       selectionChanges: [],
@@ -242,7 +221,6 @@ export async function closeConfiguredParts(
 
 export function activate(context: vscode.ExtensionContext) {
   let eventDisposables: vscode.Disposable[] = [];
-  let editorTerminalTabWasActive = false;
   const controller = new AutoCloseController(getSettings);
 
   const disposeEventListeners = () => {
@@ -265,7 +243,6 @@ export function activate(context: vscode.ExtensionContext) {
   const refreshEventListeners = () => {
     disposeEventListeners();
     controller.reset();
-    editorTerminalTabWasActive = isActiveEditorTerminalTab();
 
     const settings = getSettings();
     if (getEnabledParts(settings).length === 0) {
@@ -280,18 +257,6 @@ export function activate(context: vscode.ExtensionContext) {
         if (event.textEditor === vscode.window.activeTextEditor) {
           closeFromTrigger(controller.handleSelectionChange());
         }
-      }),
-      vscode.window.tabGroups.onDidChangeTabs(() => {
-        const editorTerminalTabIsActive = isActiveEditorTerminalTab();
-        if (!editorTerminalTabIsActive) {
-          editorTerminalTabWasActive = false;
-          return;
-        }
-
-        if (!editorTerminalTabWasActive) {
-          closeFromTrigger(controller.handleEditorTerminalFocus());
-        }
-        editorTerminalTabWasActive = true;
       })
     );
   };
